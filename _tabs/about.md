@@ -1,8 +1,8 @@
 ---
-# the default layout is 'page'
 icon: fas fa-info-circle
 order: 4
 ---
 
-> Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
-{: .prompt-tip }
+[Frenetic LLC](https://freneticllc.com/) is a California based software development company that makes games, game engines, and other software.
+
+This page is under construction.
