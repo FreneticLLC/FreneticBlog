@@ -4,6 +4,8 @@ Blog for Frenetic LLC.
 
 Built using [Jekyll](https://jekyllrb.com/).
 
+Using the [Chirpy Theme](https://chirpy.cotes.page)
+
 ### Setup
 
 - Install Jekyll per https://jekyllrb.com/docs/installation/
