@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Frenetic LLC Blog
+title: Frenetic LLC Technical Blog
 
 # it will display as the sub-title
 tagline: From the software development team at Frenetic LLC.
