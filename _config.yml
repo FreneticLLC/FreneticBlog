@@ -21,7 +21,7 @@
 title: Frenetic LLC Blog
 
 # it will display as the sub-title
-tagline: From the software development team at Frenetic LLC
+tagline: From the software development team at Frenetic LLC.
 
 email: team@freneticllc.com
 
@@ -34,10 +34,16 @@ social:
     name: Frenetic LLC
     email: team@freneticllc.com
     links:
-    - https://freneticllc.com
+        - https://freneticllc.com
+        - https://github.com/FreneticLLC
 
 twitter_username: freneticllc
 github_username: freneticllc
+
+avatar: /assets/img/frenetic-512.png
+
+lang: en
+timezone: America/Los_Angeles
 
 # the base hostname & protocol for your site, e.g. http://example.com
 url: ""
