@@ -1,6 +1,6 @@
 # Frenetic Blog
 
-Blog for Frenetic LLC.
+Blog for Frenetic LLC - https://blog.freneticllc.com/
 
 Built using [Jekyll](https://jekyllrb.com/).
 
