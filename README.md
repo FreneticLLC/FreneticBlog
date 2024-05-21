@@ -14,7 +14,7 @@ Using the [Chirpy Theme](https://chirpy.cotes.page)
 - `git submodule update --init --recursive`
 - `bundle config set --local path 'vendor/bundle'`
 - `bundle install`
-- `jekyll build` to build for external serving, or `jekyll serve` to test at `localhost:4000`
+- `bundle exec jekyll build` to build for external serving, or `bundle exec jekyll serve` to test at `localhost:4000`
 
 ### Legal
 

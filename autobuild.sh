@@ -8,6 +8,6 @@ then
     echo "Changes: $changed_files at $(date)" >> ~/checklogs.log
     git pull origin master
     rm -rf _site/
-    jekyll build
+    bundle exec jekyll build
 fi
 
