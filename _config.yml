@@ -19,20 +19,48 @@
 # in the templates via {{ site.myvariable }}.
 
 title: Frenetic LLC Blog
+
+# it will display as the sub-title
+tagline: From the software development team at Frenetic LLC
+
 email: team@freneticllc.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+
+description: >-
+    Write an awesome description for your new site here. You can edit this
+    line in _config.yml. It will appear in your document head meta (for
+    Google search results) and in your feed.xml site description.
+
+social:
+    name: Frenetic LLC
+    email: team@freneticllc.com
+    links:
+    - https://freneticllc.com
+
 twitter_username: freneticllc
-github_username:  freneticllc
+github_username: freneticllc
+
+# the base hostname & protocol for your site, e.g. http://example.com
+url: ""
+
+# the subpath of your site, e.g. /blog
+baseurl: ""
+
+# boolean type, the global switch for TOC in posts.
+toc: true
 
 # Build settings
 theme: jekyll-theme-chirpy
 plugins:
-  - jekyll-feed
+    - jekyll-feed
+
+kramdown:
+  hard_wrap: true
+
+assets:
+    self_host:
+        # TODO: The self-host package is missing bootstrap/jquery so it breaks? wtf?
+        # swap to 'true' when that's fixed
+        enabled: false
 
 # Exclude from processing.
 # The following items will not be processed, by default.

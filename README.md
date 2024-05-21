@@ -11,6 +11,7 @@ Using the [Chirpy Theme](https://chirpy.cotes.page)
 - Install Jekyll per https://jekyllrb.com/docs/installation/
 - double-check that `jekyll -v` reports a jekyll version.
 - clone this repo and open a command line inside
+- `git submodule update --init --recursive`
 - `bundle install`
 - `jekyll build` to build for external serving, or `jekyll serve` to test at `localhost:4000`
 
