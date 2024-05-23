@@ -10,6 +10,10 @@ In short: make a new file in `_posts` folder, named `[year]-[month]-[day]-[title
 
 If this is your first post, add yourself to `_data/authors.yml`
 
+If you have images/assets, put them in `assets/postmedia/(yourposttitle)/`
+
+When creating section headers, start at `##` - don't use `#`.
+
 See also https://chirpy.cotes.page/posts/write-a-new-post/ for more info about stuff to do in posts.
 
 As we teach with all code work at Frenetic: the first thing you should do before getting started, is look through existing posts and how they work, and use them as a reference for how to do it yourself.
