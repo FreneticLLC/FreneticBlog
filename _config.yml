@@ -54,6 +54,8 @@ baseurl: ""
 # boolean type, the global switch for TOC in posts.
 toc: true
 
+future: true
+
 # Build settings
 theme: jekyll-theme-chirpy
 plugins:
