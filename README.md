@@ -23,4 +23,5 @@ Copyright (C) 2024 Frenetic LLC, All Rights Reserved.
 Any software code (not blog content) used as part of the blog site itself is released under the terms of the MIT license (see [LICENSE.txt](/LICENSE.txt)).
 
 Legal specifics for actual blog content varies.
+
 Any code within a blog post generally comes from a source repo, and as such that source repo should be looked to for applicable licensing terms.
