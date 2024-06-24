@@ -1,6 +1,6 @@
-# Frenetic Blog
+# Frenetic Dev/Technical Blog
 
-Blog for Frenetic LLC - https://blog.freneticllc.com/
+Blog for Frenetic LLC's Software Development team - https://blog.freneticllc.com/
 
 Built using [Jekyll](https://jekyllrb.com/).
 
