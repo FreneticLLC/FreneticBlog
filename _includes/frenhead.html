@@ -3,12 +3,26 @@
     color: #808080;
     font-size: 92%;
 }
-html:not([data-mode="light"]) {
-    --site-title-color: #b0b0b0;
-    --heading-color: #f0f0f0;
-    --label-color: #c0c0c0;
-    --text-muted-color: #a0a0a0;
-    --sidebar-muted-color: #b0b0b0;
-    --text-color: #d0d0d0;
+.parens > a {
+    color: color-mix(in srgb, var(--link-color) 30%, var(--text-muted-color));
+}
+.image_caption {
+    color: #a0a0a0;
+    font-size: 95%;
+    text-align: center;
+    font-style: italic;
+    display: block;
+    margin: auto;
+}
+code {
+    white-space: pre;
+}
+html:not([data-mode]), html[data-mode="dark"] {
+    --site-title-color: #b0b0b0 !important;
+    --heading-color: #f0f0f0 !important;
+    --label-color: #c0c0c0 !important;
+    --text-muted-color: #a0a0a0 !important;
+    --sidebar-muted-color: #b0b0b0 !important;
+    --text-color: #d0d0d0 !important;
 }
 </style>
