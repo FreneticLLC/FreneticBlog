@@ -361,3 +361,312 @@ Naturally, frequency analysis is just one perspective to figure things out with.
 In the next post on this topic, we will dive into more advanced techniques relating to frequencies.
 
 For now, I will leave you with a question to ponder: As we discussed above, human behavior contains information across multiple frequencies. What secrets do you yourself or those around you hold tight, that would never be revealed upon direct questioning, but are made quite clear from simply watching long-term behavior? Perhaps you have friends who always talk like they don't care, but when push comes to shove always have your back. Perhaps the opposite, someone close that talks like they love you, but their patterns of behavior don't quite match. Or perhaps you hold a deeper secret, you haven't yet realized is on display for all the world to see?
+
+------------------
+
+<div class="space_eater_block"></div>
+<div class="space_eater_block"></div>
+
+------------------
+
+## Appendix A: Related Sample Code
+
+Here's C# code to play with / demo a few of the concepts displayed above.
+
+First, a `csproj` header if you need it - only dependency is ImageSharp for the image processing bits
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+	</ItemGroup>
+</Project>
+```
+{: file="MyDemo.csproj" }
+
+And here's the actual relevant source code:
+
+```cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography;
+using System.Text;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+
+namespace MyDemo;
+
+public class BlogPostLowFrequencies
+{
+    public static Random Random = new();
+
+    public static float Noise() => (float)Random.NextDouble() * 2 - 1;
+
+    /// <summary>Adds a percentage of noise to an image.</summary>
+    public static void NoiseImage(Image image, float amount)
+    {
+        image.Mutate(x =>
+        {
+            x.ProcessPixelRowsAsVector4(row =>
+            {
+                for (int i = 0; i < row.Length; i++)
+                {
+                    Vector4 vec = row[i];
+                    vec.X = Math.Clamp(vec.X + Noise() * amount, 0, 1);
+                    vec.Y = Math.Clamp(vec.Y + Noise() * amount, 0, 1);
+                    vec.Z = Math.Clamp(vec.Z + Noise() * amount, 0, 1);
+                    row[i] = vec;
+                }
+            });
+        });
+    }
+
+    /// <summary>Creates a merge of several 300% noised images.</summary>
+    public static Image CreateMergeImage(Image image, int steps, bool fancyMerge)
+    {
+        List<Image> mergables = [];
+        for (int i = 0; i < steps; i++)
+        {
+            Image duplicate300m = image.Clone(_ => { });
+            for (int j = 0; j < 3; j++)
+            {
+                NoiseImage(duplicate300m, 1);
+            }
+            mergables.Add(duplicate300m);
+        }
+        if (fancyMerge)
+        {
+            return MergeCleanly(mergables);
+        }
+        Image merged = mergables[0].Clone(_ => { });
+        merged.Mutate(x =>
+        {
+            foreach (Image merge in mergables.Skip(1))
+            {
+                x.DrawImage(merge, 1f / steps);
+            }
+        });
+        return merged;
+    }
+
+    /// <summary>Fancy RGB merge code that works a tiny bit better for large numbers of images than the opacity lazy trick.</summary>
+    public static Image MergeCleanly(List<Image> mergables)
+    {
+        Image baseImg = new Image<RgbaVector>(mergables[0].Width, mergables[0].Height);
+        float mult = 1f / mergables.Count;
+        baseImg.Mutate(x =>
+        {
+            foreach (Image entry in mergables)
+            {
+                Image copy = new Image<RgbaVector>(baseImg.Width, baseImg.Height);
+                copy.Mutate(y =>
+                {
+                    y.DrawImage(entry, PixelColorBlendingMode.Normal, 1);
+                    y.ProcessPixelRowsAsVector4(row =>
+                    {
+                        for (int i = 0; i < row.Length; i++)
+                        {
+                            row[i].X *= mult;
+                            row[i].Y *= mult;
+                            row[i].Z *= mult;
+                        }
+                    });
+                });
+                x.DrawImage(copy, PixelColorBlendingMode.Add, 1);
+            }
+        });
+        return baseImg;
+    }
+
+    /// <summary>Scale-shift based brightness/contrast fix.</summary>
+    public static void FixContrast(Image image, float mul, float sub)
+    {
+        image.Mutate(x =>
+        {
+            x.ProcessPixelRowsAsVector4(row =>
+            {
+                for (int i = 0; i < row.Length; i++)
+                {
+                    Vector4 vec = row[i];
+                    vec.X = Math.Clamp(vec.X * mul - sub, 0, 1);
+                    vec.Y = Math.Clamp(vec.Y * mul - sub, 0, 1);
+                    vec.Z = Math.Clamp(vec.Z * mul - sub, 0, 1);
+                    row[i] = vec;
+                }
+            });
+        });
+    }
+
+    /// <summary>Entry point for the noisy images demo section.</summary>
+    public static void DoNoiseCollection(string imagePath)
+    {
+        //////////////////// Get the basic noised examples for the 2x2 grid
+        Image input = Image.Load(imagePath);
+        Image duplicate50 = input.Clone(_ => { });
+        NoiseImage(duplicate50, 0.5f);
+        duplicate50.Save(imagePath + ".noised50.png");
+        Image duplicate100 = input.Clone(_ => { });
+        NoiseImage(duplicate100, 1);
+        duplicate100.Save(imagePath + ".noised100.png");
+        Image duplicate300 = input.Clone(_ => { });
+        for (int i = 0; i < 3; i++)
+        {
+            NoiseImage(duplicate300, 1);
+        }
+        duplicate300.Save(imagePath + ".noised300.png");
+        //////////////////// Now the merging example
+        Image merged = CreateMergeImage(input, 5, false);
+        merged.Save(imagePath + ".merged.png");
+        Image merged50 = CreateMergeImage(input, 50, true);
+        merged50.Save(imagePath + ".merged50.png");
+        //////////////////// Now the brightness-contrast fix to the merged images
+        Image contrastFixed300 = duplicate300.Clone(_ => { });
+        FixContrast(contrastFixed300, 5f, 2.5f);
+        contrastFixed300.Save(imagePath + ".noised300.contrast.png");
+        Image contrastFixedMerged = merged.Clone(_ => { });
+        FixContrast(contrastFixedMerged, 5f, 2.5f);
+        contrastFixedMerged.Save(imagePath + ".merged.contrast.png");
+        Image contrastFixedMerged50 = merged50.Clone(_ => { });
+        FixContrast(contrastFixedMerged50, 5, 2.5f);
+        contrastFixedMerged50.Save(imagePath + ".merged50.contrast.png");
+        Console.WriteLine("Done");
+    }
+
+    /// <summary>This is just to prove the coin flip counts idea, if you care. It creates every possible coin flip combination for 10 coins and sums them.</summary>
+    public static void CoinFlipProof()
+    {
+        int totalFlips = 10;
+        // true = heads, false = tails
+        List<bool[]> allOptions = [];
+        void AddAllCoinFlips(List<bool> prior, int remaining)
+        {
+            if (remaining == 0)
+            {
+                allOptions.Add([.. prior]);
+                return;
+            }
+            List<bool> ifTrue = new(prior) { true };
+            AddAllCoinFlips(ifTrue, remaining - 1);
+            List<bool> ifFalse = new(prior) { false };
+            AddAllCoinFlips(ifFalse, remaining - 1);
+        }
+        AddAllCoinFlips([], totalFlips);
+        Console.WriteLine($"Total number of possible arrangements: 2^{totalFlips}, or {allOptions.Count}");
+        for (int i = 0; i <= totalFlips; i++)
+        {
+            int counted = allOptions.Count(x => x.Count(y => y) == i);
+            int renderable = counted * 20 / (totalFlips * totalFlips);
+            Console.WriteLine($"The number of possible arrangements that have exactly {i:000} heads is: {counted:0000} ... {new string('=', renderable)}");
+        }
+    }
+
+    public static byte[] AesEncrypt(Aes aes, byte[] bytes)
+    {
+        ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+        using MemoryStream ms = new();
+        using CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write);
+        cs.Write(bytes, 0, bytes.Length);
+        cs.Close();
+        return ms.ToArray();
+    }
+
+    public static byte[] AesDecrypt(Aes aes, byte[] bytes)
+    {
+        ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+        using MemoryStream ms = new();
+        using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Write);
+        cs.Write(bytes, 0, bytes.Length);
+        cs.Close();
+        return ms.ToArray();
+    }
+
+    public static byte[] ImageToBytesRaw(Image<Rgb24> image)
+    {
+        Image<Rgb24> img = image;
+        byte[] bytes = new byte[img.Width * img.Height * 4];
+        img.CopyPixelDataTo(bytes);
+        return bytes;
+    }
+
+    public static void EncryptionDemo(string imagePath)
+    {
+        // Static seeded random for repeatability
+        Random keyRandom = new(123);
+        using Aes aesEcb = Aes.Create();
+        byte[] keyBytes = new byte[256 / 8];
+        keyRandom.NextBytes(keyBytes);
+        byte[] ivBytes = new byte[128 / 8];
+        keyRandom.NextBytes(ivBytes);
+        aesEcb.Mode = CipherMode.ECB;
+        aesEcb.Padding = PaddingMode.PKCS7;
+        aesEcb.Key = keyBytes;
+        aesEcb.IV = ivBytes;
+        using Aes aesCbc = Aes.Create();
+        aesCbc.Mode = CipherMode.CBC;
+        aesCbc.Padding = PaddingMode.PKCS7;
+        aesCbc.Key = keyBytes;
+        aesCbc.IV = ivBytes;
+        //////////////////////////////// Text encryption demo
+        string exampleText = "This is some example text, written with common characters in English, and encoded as ASCII bytes.";
+        void doEncryptDemo(string prefix, Aes aes)
+        {
+            byte[] textBytes = Encoding.ASCII.GetBytes(exampleText);
+            byte[] encrypted = AesEncrypt(aes, textBytes);
+            string encryptedText = new([.. Encoding.ASCII.GetString(encrypted).Select(c => c < 32 || c > 126 ? '?' : c)]);
+            byte[] decrypted = AesDecrypt(aes, encrypted);
+            string decryptedText = Encoding.ASCII.GetString(decrypted);
+            Console.WriteLine($"Encryption demo {prefix}:\nOriginal : {exampleText}\nEncrypted: {encryptedText}\nDecrypted: {decryptedText}");
+        }
+        doEncryptDemo("ECB", aesEcb);
+        doEncryptDemo("CBC", aesCbc);
+        //////////////////////////////// Image encryption demo
+        Image<Rgb24> input = Image.Load<Rgb24>(imagePath);
+        byte[] rawBytes = ImageToBytesRaw(input);
+        void doImageDemo(string prefix, Aes aes)
+        {
+            byte[] encryptedImageBytes = AesEncrypt(aes, rawBytes);
+            Image encryptedImage = Image.LoadPixelData<Rgb24>(encryptedImageBytes, input.Width, input.Height);
+            byte[] decryptedImageBytes = AesDecrypt(aes, encryptedImageBytes);
+            Image decryptedImage = Image.LoadPixelData<Rgb24>(decryptedImageBytes, input.Width, input.Height);
+            encryptedImage.Save($"{imagePath}.encrypted-{prefix}.png");
+            decryptedImage.Save($"{imagePath}.decrypted-{prefix}.png");
+        }
+        doImageDemo("ECB", aesEcb);
+        doImageDemo("CBC", aesCbc);
+        void doMergedDemo()
+        {
+            List<Image> mergeMe = [];
+            for (int i = 0; i < 100; i++)
+            {
+                keyRandom.NextBytes(ivBytes);
+                using Aes aesMerged = Aes.Create();
+                aesMerged.Mode = CipherMode.CBC;
+                aesMerged.Padding = PaddingMode.PKCS7;
+                aesMerged.Key = keyBytes;
+                aesMerged.IV = ivBytes;
+                byte[] encryptedImageBytes = AesEncrypt(aesMerged, rawBytes);
+                Image encryptedImage = Image.LoadPixelData<Rgb24>(encryptedImageBytes, input.Width, input.Height);
+                mergeMe.Add(encryptedImage);
+            }
+            Image merged = MergeCleanly(mergeMe);
+            merged.Save($"{imagePath}.encrypted.merged.png");
+        }
+        doMergedDemo();
+    }
+}
+```
+{: file="MyDemo.cs" }
+
+And of course add a `Program.cs` with a `public static void Main()` entry point, and call any of these for the different demos:
+
+- `BlogPostLowFrequencies.DoNoiseCollection(@"C:\your file path here\some image here.png");`
+- `BlogPostLowFrequencies.EncryptionDemo(@"C:\your file path here\some image here.png");`
+- `BlogPostLowFrequencies.CoinFlipProof();`
