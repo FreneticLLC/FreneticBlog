@@ -28,3 +28,7 @@ For informational posts, add key takeaways clearly separated from the broad deta
 Section headers should be written in Title Case.
 
 For deeper headers (`####` or below), you might consider switching to a more informal format.
+
+Use `<span class="parens">( ... )</span>` for small asides.
+
+Use `<span class="image_caption">...</span>` for captions below an image.
