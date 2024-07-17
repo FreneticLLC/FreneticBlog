@@ -34,6 +34,7 @@ social:
     links:
         - https://freneticllc.com
         - https://github.com/FreneticLLC
+    image: /assets/img/social-img.png
 
 twitter_username: freneticllc
 github_username: freneticllc
@@ -108,6 +109,10 @@ defaults:
         path: assets/js/dist
       values:
         swcache: true
+    - scope:
+        path: ""
+      values:
+        image: /assets/img/social-img.png
 
 sass:
     style: compressed
