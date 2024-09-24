@@ -12,7 +12,6 @@ Using the [Chirpy Theme](https://chirpy.cotes.page)
 - double-check that `jekyll -v` reports a jekyll version.
 - clone this repo and open a command line inside
 - `git submodule update --init --recursive`
-- `bundle config set --local path 'vendor/bundle'`
 - `bundle install`
 - `bundle exec jekyll build` to build for external serving, or `bundle exec jekyll serve` to test at `localhost:4000`
 
