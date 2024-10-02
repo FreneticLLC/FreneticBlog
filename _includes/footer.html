@@ -28,9 +28,46 @@
     {% endif %}
   </p>
 
+  <!-- Frenetic LLC Insert 1: Discord link -->
   <p>
     Want to talk to the nerds that write stuff like this? <a href="https://discord.gg/eggWVJt">Join our Discord</a>
   </p>
+  <!-- Frenetic LLC Insert 2: JS hack-fix for the stupid dumb bad default color mode control -->
+  <script>
+    function setDark() {
+      document.documentElement.setAttribute('data-mode', 'dark');
+      localStorage.setItem('fren_blog_color_mode', 'dark');
+      ModeToggle.isPreferDark = true;
+    }
+    function setLight() {
+      document.documentElement.setAttribute('data-mode', 'light');
+      localStorage.setItem('fren_blog_color_mode', 'light');
+      ModeToggle.isPreferDark = false;
+    }
+    window.addEventListener('message', function(event) {
+      if (event.data.direction === 'mode-toggle') {
+        if (localStorage.getItem('fren_blog_color_mode') === 'light') {
+          setDark();
+        }
+        else {
+          setLight();
+        }
+      }
+    });
+    let mode = localStorage.getItem('fren_blog_color_mode');
+    if (mode === 'dark') {
+      setDark();
+    }
+    else if (mode == 'light') {
+      setLight();
+    }
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setDark();
+    }
+    else {
+      setLight();
+    }
+  </script>
 
   <p>
     {%- capture _platform -%}
